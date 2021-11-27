@@ -10,7 +10,7 @@
 
     <img src="data.png" alt="data" style="zoom:80%;" />
 
-    * Gamma change data
+    - Gamma change data
 
     <img src="datagamma.png" alt="datagamma" style="zoom:80%;" />
 
@@ -30,16 +30,14 @@
 
       <img src="segmentation.jpeg" alt="segmentation" style="zoom:50%;" />
 
-    
-
-    * Then take the boxes position to get each cell images.
+    - Then take the boxes position to get each cell images.
 
     
 
   - Classification
-  - By using bag of visual words (BoVW) methods.
+    - By using bag of visual words (BoVW) methods.
     - By using CNN.
-  - By using resnet transfer learning.
+    - By using resnet transfer learning.
 
 
 
