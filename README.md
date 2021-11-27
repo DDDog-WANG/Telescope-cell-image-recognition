@@ -34,16 +34,12 @@
 
     * Then take the boxes position to get each cell images.
 
-    <img src="segment.png" alt="segment" style="zoom:50%;" />
-
-  
-
-  
+    
 
   - Classification
-    - By using bag of visual words (BoVW) methods.
+  - By using bag of visual words (BoVW) methods.
     - By using CNN.
-    - By using resnet transfer learning.
+  - By using resnet transfer learning.
 
 
 
