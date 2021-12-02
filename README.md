@@ -29,9 +29,9 @@
     
 
   - Classification
-  - By using bag of visual words (BoVW) methods.
+    - By using bag of visual words (BoVW) methods.
     - By using CNN.
-  - By using resnet transfer learning.
+    - By using resnet transfer learning.
 
 
 
