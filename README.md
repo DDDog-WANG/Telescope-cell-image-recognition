@@ -32,11 +32,7 @@
 
 <img src="./Datasample/bovw.png" alt="bovw" />
 
-
-
-<img src="./Datasample/H3K9me3.png"><img src="./Datasample/H3K9me3_sift.png">
-
-
+<img src="./Datasample/sift.png" alt="bovw" />
 
 - By using CNN.
 
