@@ -7,9 +7,7 @@
   - Data example
 
 
-  <img src="./Datasample/1_CTCF_conf.png" alt="1_conf_CTCF" style="zoom:50%;" /><img src="./Datasample/1_H3K9me3_conf.png" alt="1_conf_CTCF" style="zoom:50%;" />
-
-  
+  <img src="./Datasample/sample.png" alt="sample" style="zoom:50%;" />
 
   - Segmentation
 
