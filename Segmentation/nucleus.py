@@ -105,7 +105,7 @@ class NucleusConfig(Config):
     NAME = "nucleus"
 
     # Adjust depending on your GPU memory
-    IMAGES_PER_GPU = 6
+    IMAGES_PER_GPU = 1
 
     # Number of classes (including background)
     NUM_CLASSES = 1 + 1  # Background + nucleus
@@ -144,7 +144,7 @@ class NucleusConfig(Config):
     RPN_TRAIN_ANCHORS_PER_IMAGE = 64
 
     # Image mean (RGB)
-    MEAN_PIXEL = np.array([43.53, 39.56, 48.22])
+    MEAN_PIXEL = np.array([43.53, 43.53, 43.53])
 
     # If enabled, resizes instance masks to a smaller size to reduce
     # memory load. Recommended when using high-resolution images.
