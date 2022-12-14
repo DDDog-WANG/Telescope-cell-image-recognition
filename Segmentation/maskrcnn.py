@@ -51,9 +51,13 @@ def gamma_img(gamma, img):
 
 # 1. Load and Process Images
 print("1. Load and Process Images", flush=True)
-img_origin16 = io.imread(imagepath)
-img_origin = img_origin16.astype(np.uint8)
-b = img_origin[:,:,2]
+img_origin = io.imread(path)
+img_uint8 = img_origin - img_origin.min()
+img_uint8 = img_uint8 / (img_uint8.max() - img_uint8.min())
+img_uint8 *= 255
+img_uint8 = img_uint8.astype(np.uint8)
+
+b = img_uint8[:,:,2]
 img_hoechst = cv2.merge([b,b,b])
 img_hoechst = gamma_img(0.7, img_hoechst)
 print("##########################################################", flush=True)
@@ -183,7 +187,7 @@ for nn in range(F_total_boxes.shape[0]):
     bb = F_total_boxes[nn]
     mmask = F_total_masks[:,:,nn][bb[0]:bb[2], bb[1]:bb[3]].astype(np.uint16)
     mmask = cv2.merge([mmask,mmask,mmask])
-    iimg = img_origin16[bb[0]:bb[2], bb[1]:bb[3]]
+    iimg = img_origin[bb[0]:bb[2], bb[1]:bb[3]]
     iimg = np.multiply(iimg, mmask)
 
     savename=imagename[:-8]+"_"+str(nn)+'.tif'
