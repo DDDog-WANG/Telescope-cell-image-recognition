@@ -51,15 +51,14 @@ def gamma_img(gamma, img):
 
 # 1. Load and Process Images
 print("1. Load and Process Images", flush=True)
-img_origin = io.imread(path)
-img_uint8 = img_origin - img_origin.min()
-img_uint8 = img_uint8 / (img_uint8.max() - img_uint8.min())
-img_uint8 *= 255
-img_uint8 = img_uint8.astype(np.uint8)
-
-b = img_uint8[:,:,2]
+img_origin = io.imread(imagepath)
+# img_uint8 = img_origin - img_origin.min()
+# img_uint8 = img_uint8 / (img_uint8.max() - img_uint8.min())
+# img_uint8 *= 255
+b = img_origin[:,:,2]
 img_hoechst = cv2.merge([b,b,b])
-img_hoechst = gamma_img(0.7, img_hoechst)
+# img_hoechst = gamma_img(0.7, img_hoechst)
+
 print("##########################################################", flush=True)
 
 # 2. Configuration
@@ -73,7 +72,7 @@ class NucleusInferenceConfig(nucleus.NucleusConfig):
 
     DETECTION_MIN_CONFIDENCE = 0.9
     DETECTION_NMS_THRESHOLD = 0.5
-    RPN_NMS_THRESHOLD = 0.3
+    RPN_NMS_THRESHOLD = 0.2
     
     BACKBONE = "resnet50"
     
@@ -140,7 +139,7 @@ print("len(total_masks_area): ",len(total_masks_area))
 masks_outliers = []
 masks_zscore = np.abs(stats.zscore(total_masks_area))
 for c in range(bbox.shape[0]):
-    masks_outliers.append((total_masks_area[c])<30000)
+    masks_outliers.append(((total_masks_area[c])<30000) or (masks_zscore[c]>2.5))
 print("masks_outliers: ", flush=True)
 for c in range(len(total_masks_area)):
     if masks_outliers[c]:
@@ -177,9 +176,16 @@ F_total_class_ids=np.ones(F_total_boxes.shape[0], dtype=np.int32)
 print("total_boxes.shape: ",F_total_boxes.shape, flush=True)
 print("total_masks.shape: ",F_total_masks.shape, flush=True)
 
-visualize.display_instances_save(img_hoechst, F_total_boxes, F_total_masks, F_total_class_ids, ["BG","nucleus"], 
+print("##########################################################", flush=True)
+print("visualize.display_instances", flush=True)
+img_uint8 = io.imread(imagepath)
+img_uint8[img_uint8>255]=255
+b = img_uint8[:,:,2].astype(np.uint8)
+img_hoechst_unit8 = cv2.merge([b,b,b])
+visualize.display_instances_save(img_hoechst_unit8, F_total_boxes, F_total_masks, F_total_class_ids, ["BG","nucleus"], 
                                      savename=sys.argv[5]+"/"+imagename[:-8]+".png", figsize=(20, 20))
 print("save maskrcnn segmentation results as ", sys.argv[5]+"/"+imagename[:-8]+".png", flush=True)
+
 print("##########################################################", flush=True)
 print("5. Split and save each cell", flush=True)
 

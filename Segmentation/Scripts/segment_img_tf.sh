@@ -1,7 +1,7 @@
 #!/bin/bash
 #$ -cwd
 #$ -l rt_G.small=1
-#$ -l h_rt=24:00:00
+#$ -l h_rt=1:00:00
 
 # Lines starting with "#$" are regarded as qsub options:
 # "-cwd" means output files are written in the current working directory.
@@ -70,13 +70,13 @@ source ~/python3.6_env/bin/activate
 # then define variables like this
 # $data変数はjobを投げる時に設定する、今回はforで実行したいデータセットを繰り返すあげる
 PYDIR=$HOME/DDDog/Epigenetic/Segmentation
-SAVEDIR=$HOME/DDDog/Datasets/221206SoRa/SingleCells/$TYPE/$filename
+SAVEDIR=$HOME/DDDog/Datasets/221206SoRa/Single_${TYPE}/$filename
 WEIGHTDIR=$HOME/DDDog/Datasets/weights
 RESULTDIR=$PYDIR/results/$TYPE/$filename
 
 ithr=`expr $ithr - 1`
 cd $PYDIR
-for i in {001..100}; do
+for i in {001..101}; do
   DATADIR=$HOME/DDDog/Datasets/221206SoRa/$TYPE/$filename/${filename}_XY${i}.ome.tif
   IMGNAME=${filename}_XY${i}.ome.tif  
   if [ `expr $i % $nthr` = $ithr ] ; then
