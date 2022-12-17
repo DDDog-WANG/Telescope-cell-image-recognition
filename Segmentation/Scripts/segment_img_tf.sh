@@ -76,7 +76,7 @@ RESULTDIR=$PYDIR/results/$TYPE/$filename
 
 ithr=`expr $ithr - 1`
 cd $PYDIR
-for i in {001..101}; do
+for i in {001..100}; do
   DATADIR=$HOME/DDDog/Datasets/221206SoRa/$TYPE/$filename/${filename}_XY${i}.ome.tif
   IMGNAME=${filename}_XY${i}.ome.tif  
   if [ `expr $i % $nthr` = $ithr ] ; then
