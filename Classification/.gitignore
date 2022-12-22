@@ -1,4 +1,7 @@
 Datasets/
+results/
 Models/
-*.npy
+Jobs/
 *.pkl
+*.tar.gz
+*.npy

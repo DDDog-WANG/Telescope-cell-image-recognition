@@ -195,7 +195,6 @@ for nn in range(F_total_boxes.shape[0]):
     mmask = cv2.merge([mmask,mmask,mmask])
     iimg = img_origin[bb[0]:bb[2], bb[1]:bb[3]]
     iimg = np.multiply(iimg, mmask)
-
     savename=imagename[:-8]+"_"+str(nn)+'.tif'
     cv2.imwrite(savepath+"/"+savename, iimg)
     print("save name with ", savepath+"/"+savename, flush=True)
