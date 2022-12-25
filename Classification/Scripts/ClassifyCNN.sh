@@ -22,5 +22,5 @@ source ~/python7_env/bin/activate
 PYDIR=$HOME/DDDog/Epigenetic/Classification/Scripts
 DIR=$HOME/DDDog/Epigenetic/Classification
 
-python $PYDIR/ClassifyCNN_$RESNET.py $DIR $CHIP
+python $PYDIR/ClassifyCNN_KFold.py $DIR $CHIP $RESNET
 
