@@ -64,10 +64,13 @@ print("##########################################################", flush=True)
 # 2. Load Data and Model
 resnet=sys.argv[1]
 chip=sys.argv[2]
+optioncam=sys.argv[5]
 homepath = sys.argv[3]
 savepath=sys.argv[4]
+folder=chip
 print(chip, flush=True)
 print(resnet, flush=True)
+print(optioncam, flush=True)
 print(homepath, flush=True)
 print(savepath, flush=True)
 # Load Data
@@ -77,8 +80,8 @@ X_VPA = np.load(homepath+"/Datasets/VPA_"+chip+".npy",allow_pickle=True)
 y_Ctrl = torch.zeros(len(X_Ctrl), dtype=torch.int64)
 y_VPA = torch.ones(len(X_VPA), dtype=torch.int64)
 # load model
-
-if resnet=="Resnet10":
+weightpath = homepath+"/Models/"+resnet+"_"+chip+"_Fold3.pkl"
+if resnet=="Resnet10_noavg":
     class ResNet(nn.Module):
         def __init__(self):
             super(ResNet,self).__init__()
@@ -87,19 +90,19 @@ if resnet=="Resnet10":
             self.resnet.layer4 = nn.Sequential()
             self.resnet.avgpool = nn.Sequential()
             self.resnet.fc = nn.Linear(128*75*75, 2)
-            self.resnet.load_state_dict(torch.load(homepath+"/Models/"+resnet+"_"+chip+".pkl"))   
+            self.resnet.load_state_dict(torch.load(weightpath))   
         def forward(self, x):
             x = self.resnet(x)
             x = nn.Softmax(dim=1)(x)
             return x
-elif resnet=="Resnet18":
+elif resnet=="Resnet18_noavg":
     class ResNet(nn.Module):
         def __init__(self):
             super(ResNet,self).__init__()
             self.resnet = models.resnet18(weights=True)
             self.resnet.avgpool = nn.Sequential()
             self.resnet.fc = nn.Linear(512*19*19, 2)
-            self.resnet.load_state_dict(torch.load(homepath+"/Models/"+resnet+"_"+chip+".pkl"))    
+            self.resnet.load_state_dict(torch.load(weightpath))    
         def forward(self, x):
             x = self.resnet(x)
             x = nn.Softmax(dim=1)(x)
@@ -111,9 +114,8 @@ print("##########################################################", flush=True)
 
 # 3. GradCAM heatmap in samples 
 print("3. GradCAM heatmap in samples", flush=True)
-target_layers = [model.resnet.layer2[1].conv2]
+target_layers = [model.resnet.layer2]
 # cam's option: GradCAM, GradCAMPlusPlus, AblationCAM, XGradCAM, EigenCAM, ScoreCAM, FullGrad
-optioncam = "GradCAM"
 print("3.1 GradCAM heatmap in samples of Ctrl", flush=True)
 true_y = 0
 times=0
@@ -133,7 +135,7 @@ for n in range(25):
             plt.imshow(cv2.cvtColor(visualization, cv2.COLOR_BGR2RGB))
         else:
             break
-savename = savepath+"/GradCAM_sample_"+resnet+"_Ctrl_"+chip+".png"
+savename = savepath+"/"+folder+"/"+optioncam+"_sample_Ctrl"+".png"
 plt.savefig(savename)
 print("Save png as "+savename, flush=True)
 print("done", flush=True)
@@ -156,7 +158,7 @@ for n in range(50,200):
             plt.imshow(cv2.cvtColor(visualization, cv2.COLOR_BGR2RGB))
         else:
             break
-savename = savepath+"/GradCAM_sample_"+resnet+"_VPA_"+chip+".png"
+savename = savepath+"/"+folder+"/"+optioncam+"_sample_VPA"+".png"
 plt.savefig(savename)
 print("Save png as "+savename, flush=True)
 print("done", flush=True)
@@ -234,40 +236,23 @@ for n in tqdm(range(total)):
     tf,pred = predict(model,input_tensor,true_y)
     if tf == True:
         visualization,gb,cam_gb,cam = gradcams(model,input_tensor,[model.resnet.conv1],img,optioncam)
+        # intensity00_conv1+=cam[:,:,0]
         intensity00_conv1+=ZeroPaddingResizeCV(rotate(cam[:,:,0], angle-45)[y:y+h,x:x+w], size=(600, 600),n=1)
-        visualization,gb,cam_gb,cam = gradcams(model,input_tensor,[model.resnet.layer1[1].conv2],img,optioncam)
+        visualization,gb,cam_gb,cam = gradcams(model,input_tensor,[model.resnet.layer1],img,optioncam)
+        # intensity00_layer1+=cam[:,:,0]
         intensity00_layer1+=ZeroPaddingResizeCV(rotate(cam[:,:,0], angle-45)[y:y+h,x:x+w], size=(600, 600),n=1)
-        visualization,gb,cam_gb,cam = gradcams(model,input_tensor,[model.resnet.layer2[1].conv2],img,optioncam)
+        visualization,gb,cam_gb,cam = gradcams(model,input_tensor,[model.resnet.layer2],img,optioncam)
+        # intensity00_layer2+=cam[:,:,0]
         intensity00_layer2+=ZeroPaddingResizeCV(rotate(cam[:,:,0], angle-45)[y:y+h,x:x+w], size=(600, 600),n=1)
+        # intensity00_gb+=gb[:,:,0]
         intensity00_gb+=ZeroPaddingResizeCV(rotate(gb[:,:,0], angle-45)[y:y+h,x:x+w], size=(600, 600),n=1)
         count+=1
 print("Cell in Ctrl acc: {:.3f}, count: {:}, total: {:} " .format(count/total,count,total), flush=True)
-intensity00_conv1 = intensity00_conv1/(count*np.amax(intensity00_conv1))
-intensity00_layer1 = intensity00_layer1/(count*np.amax(intensity00_layer1))
-intensity00_layer2 = intensity00_layer2/(count*np.amax(intensity00_layer2))
-intensity00_gb = intensity00_gb/(count*np.amax(intensity00_gb))
-plt.figure(figsize=(10,10))
-plt.subplots_adjust(wspace=0.05, hspace=0.05)
-plt.subplot(2,4,1)
-plt.axis('off')
-plt.title("GradCAM: first")
-plt.imshow(intensity00_conv1)
-plt.subplot(2,4,2)
-plt.axis('off')
-plt.title("GradCAM: middle")
-plt.imshow(intensity00_layer1)
-plt.subplot(2,4,3)
-plt.axis('off')
-plt.title("GradCAM: final")
-plt.imshow(intensity00_layer2)
-plt.subplot(2,4,4)
-plt.axis('off')
-plt.title("guidedprop")
-plt.imshow(intensity00_gb)
-savename = savepath+"/GradCAM_average_"+resnet+"_Ctrl_"+chip+".png"
-plt.savefig(savename)
-print("Save png as "+savename, flush=True)
-print("done", flush=True)
+intensity00_conv1 = intensity00_conv1/(count)
+intensity00_layer1 = intensity00_layer1/(count)
+intensity00_layer2 = intensity00_layer2/(count)
+intensity00_gb = intensity00_gb/(count)
+
 
 print("4.2 Average Gradcam heatmap in VPA", flush=True)
 true_y = 1
@@ -287,37 +272,47 @@ for n in tqdm(range(total)):
     tf,pred = predict(model,input_tensor,true_y)
     if tf == True:
         visualization,gb,cam_gb,cam = gradcams(model,input_tensor,[model.resnet.conv1],img,optioncam)
+        # intensity01_conv1+=cam[:,:,0]
         intensity01_conv1+=ZeroPaddingResizeCV(rotate(cam[:,:,0], angle-45)[y:y+h,x:x+w], size=(600, 600),n=1)
-        visualization,gb,cam_gb,cam = gradcams(model,input_tensor,[model.resnet.layer1[1].conv2],img,optioncam)
+        visualization,gb,cam_gb,cam = gradcams(model,input_tensor,[model.resnet.layer1],img,optioncam)
+        # intensity01_layer1+=cam[:,:,0]
         intensity01_layer1+=ZeroPaddingResizeCV(rotate(cam[:,:,0], angle-45)[y:y+h,x:x+w], size=(600, 600),n=1)
-        visualization,gb,cam_gb,cam = gradcams(model,input_tensor,[model.resnet.layer2[1].conv2],img,optioncam)
+        visualization,gb,cam_gb,cam = gradcams(model,input_tensor,[model.resnet.layer2],img,optioncam)
+        # intensity01_layer2+=cam[:,:,0]
         intensity01_layer2+=ZeroPaddingResizeCV(rotate(cam[:,:,0], angle-45)[y:y+h,x:x+w], size=(600, 600),n=1)
+        # intensity01_gb+=gb[:,:,0]
         intensity01_gb+=ZeroPaddingResizeCV(rotate(gb[:,:,0], angle-45)[y:y+h,x:x+w], size=(600, 600),n=1)
         count+=1
 print("Cell in VPA acc: {:.3f}, count: {:}, total: {:} " .format(count/total,count,total), flush=True)
-intensity01_conv1 = intensity01_conv1/(count*np.amax(intensity01_conv1))
-intensity01_layer1 = intensity01_layer1/(count*np.amax(intensity01_layer1))
-intensity01_layer2 = intensity01_layer2/(count*np.amax(intensity01_layer2))
-intensity01_gb = intensity01_gb/(count*np.amax(intensity01_gb))
+intensity01_conv1 = intensity01_conv1/(count)
+intensity01_layer1 = intensity01_layer1/(count)
+intensity01_layer2 = intensity01_layer2/(count)
+intensity01_gb = intensity01_gb/(count)
+
+
+print("4.3 Show in same color scale", flush=True)
+zero_x = np.zeros((100,600))
+zero_y = np.zeros((1300,100))
 plt.figure(figsize=(10,10))
-plt.subplots_adjust(wspace=0.05, hspace=0.05)
-plt.subplot(2,4,5)
+conv1 = np.concatenate([intensity00_conv1,zero_x,intensity01_conv1],axis=0)
+layer1 = np.concatenate([intensity00_layer1,zero_x,intensity01_layer1],axis=0)
+layer2 = np.concatenate([intensity00_layer2,zero_x,intensity01_layer2],axis=0)
+gb = np.concatenate([intensity00_gb,zero_x,intensity01_gb],axis=0)
+# plt.axis('off')
+# plt.imshow(np.concatenate([conv1,zero_y,layer1,zero_y,layer2,zero_y,gb],axis=1))
+plt.subplot(1,4,1)
 plt.axis('off')
-plt.title("GradCAM: first")
-plt.imshow(intensity01_conv1)
-plt.subplot(2,4,6)
+plt.imshow(conv1/conv1.max())
+plt.subplot(1,4,2)
 plt.axis('off')
-plt.title("GradCAM: middle")
-plt.imshow(intensity01_layer1)
-plt.subplot(2,4,7)
+plt.imshow(layer1/layer1.max())
+plt.subplot(1,4,3)
 plt.axis('off')
-plt.title("GradCAM: final")
-plt.imshow(intensity01_layer2)
-plt.subplot(2,4,8)
+plt.imshow(layer2/layer2.max())
+plt.subplot(1,4,4)
 plt.axis('off')
-plt.title("guidedprop")
-plt.imshow(intensity01_gb)
-savename = savepath+"/GradCAM_average_"+resnet+"_VPA_"+chip+".png"
+plt.imshow(gb/gb.max())
+savename = savepath+"/"+folder+"/"+optioncam+"_average"+".png"
 plt.savefig(savename)
 print("Save png as "+savename, flush=True)
 print("done", flush=True)

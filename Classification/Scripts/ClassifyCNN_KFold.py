@@ -57,7 +57,7 @@ print("done", flush=True)
 print("##########################################################", flush=True)
 
 print("3. Develop model", flush=True)
-if restype=="Resnet10":
+if restype=="Resnet10_noavg":
     class ResNet(nn.Module):
         def __init__(self):
             super(ResNet,self).__init__()
@@ -70,13 +70,24 @@ if restype=="Resnet10":
             x = self.resnet(x)
             x = nn.Softmax(dim=1)(x)
             return x
+elif restype=="Resnet10":
+    class ResNet(nn.Module):
+        def __init__(self):
+            super(ResNet,self).__init__()
+            self.resnet = models.resnet18(weights=True)
+            self.resnet.layer3 = nn.Sequential()
+            self.resnet.layer4 = nn.Sequential()
+            self.resnet.fc = nn.Linear(128, 2)   
+        def forward(self, x):
+            x = self.resnet(x)
+            x = nn.Softmax(dim=1)(x)
+            return x
 elif restype=="Resnet18":
     class ResNet(nn.Module):
         def __init__(self):
             super(ResNet,self).__init__()
             self.resnet = models.resnet18(weights=True)
-            self.resnet.avgpool = nn.Sequential()
-            self.resnet.fc = nn.Linear(512*19*19, 2)   
+            self.resnet.fc = nn.Linear(512, 2)   
         def forward(self, x):
             x = self.resnet(x)
             x = nn.Softmax(dim=1)(x)
@@ -126,7 +137,6 @@ splits=KFold(n_splits,shuffle=True,random_state=42)
 batch_size = 128
 n_epochs = 100
 history = {'loss_train': [], 'loss_valid': [],'acc_train':[],'acc_valid':[]}
-best=0
 for fold, (train_idx, val_idx) in enumerate(splits.split(np.arange(len(dataset)))):
     print('Fold {}'.format(fold + 1), flush=True)
     train_sampler = SubsetRandomSampler(train_idx)
@@ -151,12 +161,11 @@ for fold, (train_idx, val_idx) in enumerate(splits.split(np.arange(len(dataset))
         history['loss_valid'].append(loss_valid)
         history['acc_train'].append(acc_train)
         history['acc_valid'].append(acc_valid)
-    if acc_valid > best:
-        best = acc_valid
-        for param in model.parameters():
-            param.requires_grad = True
-            torch.save(model.module.resnet.state_dict(),homepath+"/Models/"+restype+"_"+datatype+".pkl")
-        print("saved model as "+homepath+"/Models/"+restype+"_"+datatype+".pkl", flush=True)
+    savemodel = homepath+"/Models/"+restype+"_Fold"+str(fold)+"_"+datatype+".pkl"
+    for param in model.parameters():
+        param.requires_grad = True
+        torch.save(model.module.resnet.state_dict(),savemodel)
+    print("saved model as "+savemodel, flush=True)
 print("done", flush=True)
 print("##########################################################", flush=True)
 homepath

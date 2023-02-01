@@ -21,7 +21,7 @@ source ~/python7_env/bin/activate
 
 PYDIR=$HOME/DDDog/Epigenetic/Classification/Scripts
 DIR=$HOME/DDDog/Epigenetic/Classification
-SAVE=$DIR/results/results_GradCAM_latest
+SAVE=$DIR/results/2023/GradCAM_20230201
 
-python $PYDIR/GradCAM.py $RESNET $CHIP $DIR $SAVE
+python $PYDIR/GradCAM.py $RESNET $CHIP $DIR $SAVE $CAM
 
