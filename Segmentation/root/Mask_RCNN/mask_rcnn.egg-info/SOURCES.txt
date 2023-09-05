@@ -12,5 +12,6 @@ mrcnn/__init__.py
 mrcnn/config.py
 mrcnn/model.py
 mrcnn/parallel_model.py
+mrcnn/postprocessing.py
 mrcnn/utils.py
 mrcnn/visualize.py

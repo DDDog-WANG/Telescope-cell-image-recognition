@@ -1,7 +1,7 @@
 #!/bin/bash
 #$ -cwd
-#$ -l rt_G.large=1
-#$ -l h_rt=24:00:00
+#$ -l rt_F=1
+#$ -l h_rt=60:00:00
 
 # rt_C.small
 # 5CPU / 30GB memory / max 168h / 0.2p/h
@@ -22,5 +22,15 @@ source ~/python7_env/bin/activate
 PYDIR=$HOME/DDDog/Epigenetic/Classification/Scripts
 DIR=$HOME/DDDog/Epigenetic/Classification
 
+model_dir=$DIR/results/2023/Train/${RESNET}_${CHIP}
+result_dir=$DIR/Models/${RESNET}_${CHIP}
+if [ ! -d "$model_dir" ]; then
+    mkdir $model_dir
+    echo "mkdir $model_dir"
+fi
+if [ ! -d "$result_dir" ]; then    
+    mkdir $result_dir
+    echo "mkdir $result_dir"
+fi
 python $PYDIR/ClassifyCNN_KFold.py $DIR $CHIP $RESNET
 

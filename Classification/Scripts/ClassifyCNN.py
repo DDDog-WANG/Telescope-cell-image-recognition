@@ -145,7 +145,7 @@ print("done", flush=True)
 print("##########################################################", flush=True)
 
 print("5. Train by KFold of Cross Validation", flush=True)
-n_epochs = 100
+n_epochs = 500
 model.avgpool = nn.AdaptiveAvgPool2d(1)
 loss_function = nn.BCELoss()
 optimizer = torch.optim.Adam(model.parameters(), lr=0.00001)

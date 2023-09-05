@@ -91,7 +91,7 @@ elif restype=="Resnet18":
         def forward(self, x):
             x = self.resnet(x)
             x = nn.Softmax(dim=1)(x)
-            return x    
+            return x     
 print("done", flush=True)
 print("##########################################################", flush=True)
 
@@ -135,7 +135,7 @@ print("5. Train by KFold of Cross Validation", flush=True)
 n_splits=5
 splits=KFold(n_splits,shuffle=True,random_state=42)
 batch_size = 128
-n_epochs = 100
+n_epochs = 500
 history = {'loss_train': [], 'loss_valid': [],'acc_train':[],'acc_valid':[]}
 for fold, (train_idx, val_idx) in enumerate(splits.split(np.arange(len(dataset)))):
     print('Fold {}'.format(fold + 1), flush=True)
@@ -161,14 +161,14 @@ for fold, (train_idx, val_idx) in enumerate(splits.split(np.arange(len(dataset))
         history['loss_valid'].append(loss_valid)
         history['acc_train'].append(acc_train)
         history['acc_valid'].append(acc_valid)
-    savemodel = homepath+"/Models/"+restype+"_Fold"+str(fold)+"_"+datatype+".pkl"
+    savemodel = homepath+"/Models/"+restype+"_"+datatype+"/"+"Fold"+str(fold)+".pkl"
     for param in model.parameters():
         param.requires_grad = True
         torch.save(model.module.resnet.state_dict(),savemodel)
     print("saved model as "+savemodel, flush=True)
 print("done", flush=True)
 print("##########################################################", flush=True)
-homepath
+
 print("6. plot the figure of training process", flush=True)
 loss_train_avg = np.zeros(n_epochs)
 loss_valid_avg = np.zeros(n_epochs)
@@ -184,7 +184,7 @@ for num in range(n_splits):
     acc_train_avg+=acc_train
     acc_valid_avg+=acc_valid
     name_title="Fold_"+str(num)+'_Training and Validation accuracy'
-    savepath = homepath+"/results/"+restype+"_"+datatype+"/"+name_title+".png"
+    savepath = homepath+"/results/2023/Train/"+restype+"_"+datatype+"/"+name_title+".png"
     plt.figure(figsize=(12, 8))
     plt.ylim(0,1.0)
     plt.plot(range(1,n_epochs+1), acc_train, 'b', label='Training accuracy')  
@@ -197,7 +197,7 @@ loss_valid_avg = loss_valid_avg/n_splits
 acc_train_avg = acc_train_avg/n_splits
 acc_valid_avg = acc_valid_avg/n_splits
 name_title="Average Training and Validation accuracy"
-savepath = homepath+"/results/"+restype+"_"+datatype+"/"+name_title+".png"
+savepath = homepath+"/results/2023/Train/"+restype+"_"+datatype+"/"+name_title+".png"
 plt.figure(figsize=(12, 8))
 plt.ylim(0,1.0)
 plt.plot(range(1,n_epochs+1), acc_train_avg, 'b', label='Training accuracy')  
