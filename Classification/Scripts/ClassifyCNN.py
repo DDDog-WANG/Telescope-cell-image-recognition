@@ -63,16 +63,16 @@ train_data_01 = 0
 train_size = len(train_data)
 for i in range(train_size):
     train_data_01+=int(train_data[i][1][1].item())
-print("Total number of train : ", train_size, shuffle=True)
-print("train_class_0: ", train_size-train_data_01, shuffle=True)
-print("train_class_1: ", train_data_01, shuffle=True)
+print("Total number of train : ", train_size, flush=True)
+print("train_class_0: ", train_size-train_data_01, flush=True)
+print("train_class_1: ", train_data_01, flush=True)
 valid_data_01 = 0
 valid_size = len(valid_data)
 for i in range(valid_size):
     valid_data_01+=int(valid_data[i][1][1].item())
-print("\nTotal number of valid : ", valid_size, shuffle=True)
-print("valid_class_0 num : ", valid_size-valid_data_01, shuffle=True)
-print("valid_class_1 num : ", valid_data_01, shuffle=True)
+print("\nTotal number of valid : ", valid_size, flush=True)
+print("valid_class_0 num : ", valid_size-valid_data_01, flush=True)
+print("valid_class_1 num : ", valid_data_01, flush=True)
 print("done", flush=True)
 print("##########################################################", flush=True)
 
@@ -82,6 +82,20 @@ if restype=="Resnet10":
         def __init__(self):
             super(ResNet,self).__init__()
             self.resnet = models.resnet18(weights=True)
+            self.resnet.layer3 = nn.Sequential()
+            self.resnet.layer4 = nn.Sequential()
+            self.resnet.avgpool = nn.Sequential()
+            self.resnet.fc = nn.Linear(128*75*75, 2)   
+        def forward(self, x):
+            x = self.resnet(x)
+            x = nn.Softmax(dim=1)(x)
+            return x
+elif restype=="Resnet10_max2avg":
+    class ResNet(nn.Module):
+        def __init__(self):
+            super(ResNet,self).__init__()
+            self.resnet = models.resnet18(weights=True)
+            self.resnet.maxpool = nn.AvgPool2d(kernel_size=3, stride=2, padding=1)
             self.resnet.layer3 = nn.Sequential()
             self.resnet.layer4 = nn.Sequential()
             self.resnet.avgpool = nn.Sequential()
@@ -145,7 +159,7 @@ print("done", flush=True)
 print("##########################################################", flush=True)
 
 print("5. Train by KFold of Cross Validation", flush=True)
-n_epochs = 500
+n_epochs = 300
 model.avgpool = nn.AdaptiveAvgPool2d(1)
 loss_function = nn.BCELoss()
 optimizer = torch.optim.Adam(model.parameters(), lr=0.00001)
@@ -156,7 +170,7 @@ for epoch in range(n_epochs):
     loss_valid, acc_valid = valid(model,device,dataloader_valid,loss_function)
     scheduler.step()
     print('EPOCH: {}, Train [Loss: {:.3f}, Accuracy: {:.3f}], Valid [Loss: {:.3f}, Accuracy: {:.3f}]'
-          .format(epoch, loss_train, acc_train, loss_valid, acc_valid))   
+          .format(epoch, loss_train, acc_train, loss_valid, acc_valid), flush=True)   
     history['loss_train'].append(loss_train)
     history['loss_valid'].append(loss_valid)
     history['acc_train'].append(acc_train)

@@ -1,7 +1,7 @@
 #!/bin/bash
 #$ -cwd
 #$ -l rt_F=1
-#$ -l h_rt=60:00:00
+#$ -l h_rt=10:00:00
 
 # rt_C.small
 # 5CPU / 30GB memory / max 168h / 0.2p/h
@@ -16,8 +16,8 @@
 
 source /etc/profile.d/modules.sh
 module purge
-module load gcc/11.2.0 python/3.7/3.7.13 cuda/11.0/11.0.3 cudnn/8.1/8.1.1
-source ~/python7_env/bin/activate
+module load gcc/12.2.0 python/3.10/3.10.10 cuda/11.7/11.7.1 cudnn/8.8/8.8.1
+source ~/python10_env/bin/activate
 
 PYDIR=$HOME/DDDog/Epigenetic/Classification/Scripts
 DIR=$HOME/DDDog/Epigenetic/Classification
@@ -32,5 +32,5 @@ if [ ! -d "$result_dir" ]; then
     mkdir $result_dir
     echo "mkdir $result_dir"
 fi
-python $PYDIR/ClassifyCNN_KFold.py $DIR $CHIP $RESNET
+python $PYDIR/ClassifyCNN.py $DIR $CHIP $RESNET
 
