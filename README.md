@@ -14,13 +14,13 @@ Image-based profiling has been combined with machine learning for various tasks 
 
 ![Figure 1](./figures/outline.png)
 
+
+
 ### 1. Image acquisition by high-speed super-resolution microscope SoRa
 
-* Cells were imaged by Yokogawa CSU-W1 SoRa super-resolution spinning disc confocal system (Tokyo, Japan).
+Cells were imaged by Yokogawa CSU-W1 SoRa super-resolution spinning disc confocal system (Tokyo, Japan).
 
-
-
-![Figure 2](./figures/image samples.png) 
+![Figure 2](./figures/image_samples.png) 
 
 
 
@@ -28,13 +28,15 @@ Image-based profiling has been combined with machine learning for various tasks 
 
 Mask R-CNN [He et.al. IEEE 2017] was used for identifying different cell nuclei in a multi-cell image. Our Mask R-CNN model was trained using a public dataset, 2018 Data Science Bowl [Caicedo JC et.al. Nature methods 2019]. In following result sample, different color means different nuclears.
 
-![Figure 3](./figures/segmentation results.png)
+![Figure 3](./figures/segmentation_results.png)
+
+
 
 ### Deep-learning-based discrimination of epigenetic states
 
 For models, three kinds of CNN-based models were tested. Following figure only shows main model we used, ResNet model with 9 convolution layers and one fully-connected layer.
 
-![Figure 5](./figures/discrimination model.png)
+![Figure 5](./figures/discrimination_model.png)
 
 
 
@@ -42,7 +44,7 @@ For models, three kinds of CNN-based models were tested. Following figure only s
 
 We utilized Score-CAM [Wang H. et.al. IEEE 2020] to highlight crucial regions of cell images that influenced the  discrimination of the epigenetic states by our CNN models. The nuclear periphery shows higher intensities compared to inner-nucleus regions, which might be the potential biomarker for the epigenetic change induced by VPA treatment.
 
-![Figure 6](./figures/image biomarkers.png)
+![Figure 6](./figures/image_biomarkers.png)
 
 
 
