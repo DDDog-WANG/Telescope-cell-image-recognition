@@ -1,6 +1,8 @@
 Datasets/
 results/
+results_cam/
 Models/
+Models_230201/
 Jobs/
 *.pkl
 *.tar.gz
