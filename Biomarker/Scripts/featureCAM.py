@@ -17,7 +17,7 @@ if __name__ == "__main__":
     parser.add_argument("--stain_type", type=str, default="All")
     parser.add_argument("--cam_type", type=str, default="GradCAM")
     parser.add_argument("--image_path", type=str, default="/home/acd13264yb/DDDog/Epigenetic/Classification/results_cam")
-    parser.add_argument("--save_path", type=str, default="/home/acd13264yb/DDDog/Epigenetic/Features")
+    parser.add_argument("--save_path", type=str, default="/home/acd13264yb/DDDog/Epigenetic/Biomarker")
     args = parser.parse_args()
 ctrl_type = args.ctrl_type
 stain_type = args.stain_type

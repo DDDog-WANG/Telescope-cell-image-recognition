@@ -15,7 +15,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--ctrl_type", type=str, default="CTRL")
     parser.add_argument("--image_path", type=str, default="/home/acd13264yb/DDDog/Epigenetic/Classification/Datasets")
-    parser.add_argument("--save_path", type=str, default="/home/acd13264yb/DDDog/Epigenetic/Features")
+    parser.add_argument("--save_path", type=str, default="/home/acd13264yb/DDDog/Epigenetic/Biomarker")
     args = parser.parse_args()
 ctrl_type = args.ctrl_type
 image_path = args.image_path
