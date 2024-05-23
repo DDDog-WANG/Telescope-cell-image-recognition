@@ -1,7 +1,7 @@
 #!/bin/bash
 #$ -cwd
-#$ -l rt_G.small=1
-#$ -l h_rt=24:00:00
+#$ -l rt_F=1
+#$ -l h_rt=1:00:00
 
 # rt_C.small
 # 5CPU / 30GB memory / max 168h / 0.2p/h
@@ -16,12 +16,34 @@
 
 source /etc/profile.d/modules.sh
 module purge
-module load gcc/11.2.0 python/3.7/3.7.13 cuda/11.0/11.0.3 cudnn/8.1/8.1.1
-source ~/python7_env/bin/activate
+module load gcc/13.2.0 python/3.10/3.10.14 cuda/11.8/11.8.0 cudnn/8.8/8.8.1
+source ~/python10_env/bin/activate
 
-PYDIR=$HOME/DDDog/Epigenetic/Classification/Scripts
-DIR=$HOME/DDDog/Epigenetic/Classification
-SAVE=$DIR/results/2023/GradCAM_20230201
-
-python $PYDIR/Biomarker.py $RESNET $CHIP $DIR $SAVE $CAM
+HOMEPATH=$HOME/DDDog/Epigenetic/Classification
+PYDIR=$HOMEPATH/Scripts/CAM.py
+STAINTYPE=$STAINTYPE
+MODELTYPE=Resnet10_noavg
+CTRLTYPE=$CTRLTYPE
+IMAGEPATH=$HOMEPATH/Datasets
+MODELPATH=$HOMEPATH/Models
+CAMTYPE=ScoreCAM
+CAMPATH=$HOMEPATH/results_cam/${CTRLTYPE}_${STAINTYPE}_${MODELTYPE}_${CAMTYPE}
+TARGET_LAYER="model.resnet.layer2"
+if [ ! -d "$CAMPATH" ]; then
+    mkdir $CAMPATH
+    echo "mkdir $CAMPATH"
+fi
+echo "#############################"
+echo 👑 BASH SCRIPT START
+echo PYDIR: $PYDIR
+echo STAINTYPE: "$STAINTYPE"
+echo MODELTYPE: "$MODELTYPE"
+echo CTRLTYPE: "$CTRLTYPE"
+echo IMAGEPATH: "$IMAGEPATH"
+echo MODELPATH: "$MODELPATH"
+echo CAMPATH: "$CAMPATH"
+echo CAMTYPE: "$CAMTYPE"
+echo TARGET_LAYER: "$TARGET_LAYER"
+echo "#############################"
+python $PYDIR --stain_type $STAINTYPE --ctrl_type $CTRLTYPE --model_type $MODELTYPE --image_path $IMAGEPATH --model_path $MODELPATH --cam_path $CAMPATH --cam_type $CAMTYPE --target_layer $TARGET_LAYER
 
